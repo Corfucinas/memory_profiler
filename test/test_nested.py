@@ -9,11 +9,10 @@ def test_1():
     del b
 
     def test_2():
-        a = [1] * (10 ** 6)
         b = [2] * (2 * 10 ** 7)
         del b
 
-        return a
+        return [1] * (10 ** 6)
 
     return test_2
 

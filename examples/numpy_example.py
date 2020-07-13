@@ -4,17 +4,13 @@ import scipy.signal
 
 @profile
 def create_data():
-    ret = []
-    for n in range(70):
-        ret.append(np.random.randn(1, 70, 71, 72))
-    return ret
+    return [np.random.randn(1, 70, 71, 72) for _ in range(70)]
 
 
 @profile
 def process_data(data):
     data = np.concatenate(data)
-    detrended = scipy.signal.detrend(data, axis=0)
-    return detrended
+    return scipy.signal.detrend(data, axis=0)
 
 
 if __name__ == "__main__":

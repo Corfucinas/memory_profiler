@@ -291,11 +291,7 @@ def memory_usage(proc=-1, interval=.1, timeout=None, timestamps=False,
     if stream is not None:
         timestamps = True
 
-    if not max_usage:
-        ret = []
-    else:
-        ret = -1
-
+    ret = [] if not max_usage else -1
     if timeout is not None:
         max_iter = int(round(timeout / interval))
     elif isinstance(proc, int):
@@ -358,7 +354,11 @@ def memory_usage(proc=-1, interval=.1, timeout=None, timestamps=False,
         # external process, launched from Python
         line_count = 0
         while True:
-            if not max_usage:
+            if max_usage:
+                ret = max(ret,
+                          _get_memory(
+                              proc.pid, backend, include_children=include_children))
+            else:
                 mem_usage = _get_memory(
                     proc.pid, backend, timestamps=timestamps,
                     include_children=include_children)
@@ -379,10 +379,6 @@ def memory_usage(proc=-1, interval=.1, timeout=None, timestamps=False,
 
                     # Append the memory usage to the return value
                     ret.append(mem_usage)
-            else:
-                ret = max(ret,
-                          _get_memory(
-                              proc.pid, backend, include_children=include_children))
             time.sleep(interval)
             line_count += 1
             # flush every 50 lines. Make 'tail -f' usable on profile file
@@ -400,10 +396,13 @@ def memory_usage(proc=-1, interval=.1, timeout=None, timestamps=False,
         # external process
         if max_iter == -1:
             max_iter = 1
-        counter = 0
-        while counter < max_iter:
-            counter += 1
-            if not max_usage:
+        for counter in range(1, max_iter + 1):
+            if max_usage:
+                ret = max([ret,
+                           _get_memory(proc, backend, include_children=include_children)
+                           ])
+
+            else:
                 mem_usage = _get_memory(
                     proc, backend, timestamps=timestamps,
                     include_children=include_children)
@@ -423,11 +422,6 @@ def memory_usage(proc=-1, interval=.1, timeout=None, timestamps=False,
 
                     # Append the memory usage to the return value
                     ret.append(mem_usage)
-            else:
-                ret = max([ret,
-                           _get_memory(proc, backend, include_children=include_children)
-                           ])
-
             time.sleep(interval)
             # Flush every 50 lines.
             if counter % 50 == 0 and stream is not None:
@@ -1062,10 +1056,8 @@ class MemoryProfilerMagics(Magics):
         _func_exec(setup, self.shell.user_ns)
 
         mem_usage = []
-        counter = 0
         baseline = memory_usage()[0]
-        while counter < repeat:
-            counter += 1
+        for _ in range(repeat):
             tmp = memory_usage((_func_exec, (stmt, self.shell.user_ns)),
                                timeout=timeout, interval=interval,
                                max_usage=True,
@@ -1164,7 +1156,7 @@ def choose_backend(new_backend=None):
         ('posix', os.name == 'posix'),
         ('tracemalloc', has_tracemalloc),
     ]
-    backends_indices = dict((b[0], i) for i, b in enumerate(all_backends))
+    backends_indices = {b[0]: i for i, b in enumerate(all_backends)}
 
     if new_backend is not None:
         all_backends.insert(0, all_backends.pop(backends_indices[new_backend]))

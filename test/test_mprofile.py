@@ -5,15 +5,13 @@ import time
 @profile
 def test1(l):
     """test1 docstring"""
-    a = [1] * l
     time.sleep(1)
-    return a
+    return [1] * l
 
 @profile
 def test2(l):
-    b = [1] * l
     time.sleep(1)
-    return b
+    return [1] * l
 
 def test3(l):
     """test3 docstring"""

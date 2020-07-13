@@ -42,11 +42,9 @@ class TestIncrementDisplay(unittest.TestCase):
     def test_loop_incr(self):
 
         def loop_incr():
-            a = []
             b = [2] * (2 * 10 ** 7)      # line -4
-            for i in range(3):
-                c = [2] * (2 * 10 ** 7)  # line -2
-                a.append(c)
+            c = [2] * (2 * 10 ** 7)  # line -2
+            a = [c for _ in range(3)]
 
         profiler = LineProfiler()
         wrapped = profiler(loop_incr)

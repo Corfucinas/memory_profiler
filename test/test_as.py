@@ -2,8 +2,7 @@ import math
 
 @profile
 def f():
-    o = math.sqrt(2013)
-    return o
+    return math.sqrt(2013)
 
 if __name__ == '__main__':
     f()

@@ -44,7 +44,7 @@ def get_action():
     if len(sys.argv) <= 1:
         print_usage()
         sys.exit(1)
-    if not sys.argv[1] in ALL_ACTIONS:
+    if sys.argv[1] not in ALL_ACTIONS:
         print_usage()
         sys.exit(1)
 
@@ -234,11 +234,9 @@ This file contains the process memory consumption, in Mb (one value per line).""
         if args.include_children:
             extra_args.append("--include-children")
         program[1:1] = extra_args
-        p = subprocess.Popen(program)
     else:
         cmd_line = get_cmd_line(program)
-        p = subprocess.Popen(program)
-
+    p = subprocess.Popen(program)
     with open(mprofile_output, "a") as f:
         f.write("CMDLINE {0}\n".format(cmd_line))
         mp.memory_usage(proc=p, interval=args.interval, timestamps=True,
@@ -350,8 +348,6 @@ def read_mprofile_file(filename):
 
         elif field == "CMDLINE":
             cmd_line = value
-        else:
-            pass
     f.close()
 
     return {"mem_usage": mem_usage, "timestamp": timestamp,
@@ -402,7 +398,6 @@ def plot_file(filename, index=0, timestamps=True, children=True, options=None):
     max_mem = mem.max()
     max_mem_ind = mem.argmax()
 
-    all_colors = ("c", "y", "g", "r", "b")
     mem_line_colors = ("k", "b", "r", "g", "c", "y", "m")
 
     show_trend_slope = options is not None and hasattr(options, 'slope') and options.slope is True
@@ -468,6 +463,7 @@ def plot_file(filename, index=0, timestamps=True, children=True, options=None):
     if len(ts) > 0 and timestamps:
         func_num = 0
         f_labels = function_labels(ts.keys())
+        all_colors = ("c", "y", "g", "r", "b")
         for f, exec_ts in ts.items():
             for execution in exec_ts:
                 add_brackets(execution[:2], execution[2:], xshift=global_start,

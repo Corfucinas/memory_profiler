@@ -3,9 +3,7 @@
 import time
 
 def test_1():
-    a = {}
-    for i in range(10000):
-        a[i] =  i + 1
+    a = {i: i + 1 for i in range(10000)}
     return
 
 @profile
@@ -14,8 +12,8 @@ def test_2():
     b = [2] * (2 * 10 ** 7)
     del b
 
-    for i in range(2):
-        a = [1] * (10 ** 6)
+    a = [1] * (10 ** 6)
+    for _ in range(2):
         b = [2] * (2 * 10 ** 7)
         del b
     return a

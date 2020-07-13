@@ -20,7 +20,7 @@ def worker(num, wait, amt=X6):
     """
     frame = []
 
-    for idx in range(num):
+    for _ in range(num):
         frame.extend([1] * amt)
         time.sleep(wait)
 
